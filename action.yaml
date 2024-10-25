@@ -1,0 +1,42 @@
+# action.yml
+name: Emerging Talent CI Checks
+description: "GitHub action with code quality checks for Emerging Talent materials."
+
+branding:
+  icon: "check-circle"
+  color: "green"
+
+inputs:
+  src:
+    required: false
+    type: string
+    default: ""
+
+runs:
+  using: "composite"
+  steps:
+    - name: checkout code
+      uses: actions/checkout@v4
+
+    # passing ruff linting is required
+    - name: Check Linting - ruff
+      uses: astral-sh/ruff-action@v1
+
+    # passing pylint is not required - discuss errors in code review
+    # adapted from https://github.com/davidslusser/actions_python_pylint/tree/main
+    - name: setup python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.x"
+      if: always()
+    - name: python version
+      run: python --version
+      shell: bash
+    - name: install pylint
+      run: |
+        python -m pip install --upgrade pip
+        pip install pylint
+      shell: bash
+    - name: Check Linting - pylint
+      run: "pylint ${{ inputs.src }}  || echo '::warning title=Pylint Error(s)::Discuss solutions and trade-offs in code review.'"
+      shell: bash

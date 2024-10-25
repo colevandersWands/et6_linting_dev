@@ -1,0 +1,1 @@
+# Emerging Talent Cohort 6: Linting Checks
